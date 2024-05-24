@@ -1,5 +1,12 @@
 import express from "express";
-import { query, validationResult, body, matchedData } from "express-validator";
+import {
+  query,
+  validationResult,
+  body,
+  matchedData,
+  checkSchema,
+} from "express-validator";
+import { validationSchemas } from "./validationSchemas.mjs";
 
 const port = process.env.PORT || 3000;
 const app = express();
@@ -52,31 +59,18 @@ app.get(
     } else response.send(users);
   }
 );
-app.post(
-  "/api/users",
-  body("username")
-    .notEmpty()
-    .withMessage("username ca not be empty")
-    .isLength({ min: 5, max: 32 })
-    .withMessage(
-      "Username must be at least 5 characters with a max of 32 characters"
-    )
-    .isString()
-    .withMessage("Username must be a string!"),
-  body("displayName").notEmpty(),
-  (request, response) => {
-    const result = validationResult(request);
-    if (!result.isEmpty()) {
-      return response.status(400).send({ errors: result.array() });
-    }
-    const data = matchedData(request);
-    console.log("data=", data);
-    const { username, displayName } = request.body;
-    const newUser = { id: users.length + 1, username, displayName };
-    users.push(newUser);
-    return resposne.status(201).send(newUser);
+app.post("/api/users", checkSchema(validationSchemas), (request, response) => {
+  const result = validationResult(request);
+  if (!result.isEmpty()) {
+    return response.status(400).send({ errors: result.array() });
   }
-);
+  const data = matchedData(request);
+  console.log("data=", data);
+  const { username, displayName } = request.body;
+  const newUser = { id: users.length + 1, username, displayName };
+  users.push(newUser);
+  return resposne.status(201).send(newUser);
+});
 app.get("/api/products", (request, response) => [
   response.send([{ id: 123, name: "chicken breast", price: 12.99 }]),
 ]);
