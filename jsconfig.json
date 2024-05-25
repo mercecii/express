@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "ES6",
+    "strict": true,
+    "checkJs": true, // this is important. This will raise error when try use something without importing it.
+    "moduleResolution": "node"
+  },
+  "exclude": ["node_modules"]
+}
