@@ -9,9 +9,9 @@ import {
 } from "express-validator";
 import { resolveIndexByUserId } from "../utils/middlewares.mjs";
 
-const router = Router();
+const usersRouter = Router();
 
-router.get(
+usersRouter.get(
   "/api/users",
   query("filter")
     .isString()
@@ -21,8 +21,8 @@ router.get(
     .withMessage("Must Be at least 3-10 Characters"),
 
   (request, response) => {
-    const result = validationResult(request);
-    console.log("result = ", result);
+    const validationOutput = validationResult(request);
+    console.log("validationOutput = ", validationOutput);
     const { filter, value } = request.query;
     if (!filter && !value) response.send(users);
     else if (filter && value) {
@@ -31,7 +31,7 @@ router.get(
     } else response.send(users);
   }
 );
-router.post(
+usersRouter.post(
   "/api/users",
   checkSchema(validationSchemas),
   (request, response) => {
@@ -48,7 +48,7 @@ router.post(
   }
 );
 
-router.get("/api/users/:id", (request, response) => {
+usersRouter.get("/api/users/:id", (request, response) => {
   const { id } = request.params;
   if (isNaN(parseInt(id))) {
     return response.status(400).send({ msg: "Bad Request. Invalid ID." });
@@ -58,22 +58,30 @@ router.get("/api/users/:id", (request, response) => {
   response.send(user);
 });
 
-router.put("/api/users/:id", resolveIndexByUserId, (request, response) => {
+usersRouter.put("/api/users/:id", resolveIndexByUserId, (request, response) => {
   const { body, index } = request;
   users[index] = body;
   response.status(200).send(users[index]);
 });
 
-router.patch("/api/users/:id", resolveIndexByUserId, (request, response) => {
-  const { index } = request;
-  users[index] = { ...users[index], ...request.body };
-  response.status(200).send(users[index]);
-});
-router.delete("/api/users/:id", resolveIndexByUserId, (request, response) => {
-  const { index } = request;
-  const temp = users[index];
-  users.splice(index, 1);
-  response.status(200).send(temp);
-});
+usersRouter.patch(
+  "/api/users/:id",
+  resolveIndexByUserId,
+  (request, response) => {
+    const { index } = request;
+    users[index] = { ...users[index], ...request.body };
+    response.status(200).send(users[index]);
+  }
+);
+usersRouter.delete(
+  "/api/users/:id",
+  resolveIndexByUserId,
+  (request, response) => {
+    const { index } = request;
+    const temp = users[index];
+    users.splice(index, 1);
+    response.status(200).send(temp);
+  }
+);
 
-export default router;
+export default usersRouter;
