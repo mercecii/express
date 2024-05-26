@@ -2,6 +2,9 @@ import { users } from "./constants.mjs";
 
 export const loggingMiddleware = (request, response, next) => {
   console.log(`${request.method} - ${request.url}`);
+  console.log("COOKIE:", request.headers.cookie);
+  console.log("PARSED COOKIE:", request.cookies);
+  console.log("PARSED signedCookies:", request.signedCookies);
   next();
 };
 export const randomMiddleWare = (request, response, next) => {

@@ -1,19 +1,23 @@
 import express from "express";
 import { loggingMiddleware } from "./utils/middlewares.mjs";
-import { default as usersRouter } from "./routes/users.mjs";
-import { default as productRouter } from "./routes/products.mjs";
 import rootRouter from "./routes/index.mjs";
+import cookieParser from "cookie-parser";
 
+// --------------------------------- //
 const PORT = process.env.PORT || 3000;
 const app = express();
 app.use(express.json());
+app.use(cookieParser("helloworld"));
 
 app.use(loggingMiddleware);
 app.use(rootRouter);
-app.get("/", (request, response) => {
-  response.status(201).send({ msg: "hello" });
-});
 
 app.listen(PORT, () => {
   console.log(`Running on Port ${PORT}`);
+});
+
+// ---------------------------------- //
+app.get("/", (request, response) => {
+  response.cookie("hello", "world", { maxAge: 1000 * 60, signed: true });
+  response.status(201).send({ msg: "hello" });
 });
